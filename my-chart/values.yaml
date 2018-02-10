@@ -1,0 +1,44 @@
+# django app
+django:
+  tier: backend
+  app: django
+  role: worker
+
+  # must be the same as gunicorn in `run_django.sh`
+  workersPort: 8000
+  # port from where djangoapp is going to be accessible
+  externalPort: 1234
+
+  djangoappImage: eu.gcr.io/<GCP_PROJECT_ID>/djangoapp-worker
+
+  cpuLimit: "1"
+  cpuRequest: "0.1"
+  memoryLimit: "400Mi"
+  memoryRequest: "300Mi"
+
+cloudsql:
+  cpuLimit: "0.1"
+  cpuRequest: "0.01"
+  memoryLimit: "100Mi"
+  memoryRequest: "10Mi"
+
+# redis app
+redis:
+  image: redis:4-alpine
+  port: 6379
+
+  tier: backend
+  app: redis
+  roleSlave: slave
+  roleMaster: master
+
+  cpuLimit: "0.1"
+  cpuRequest: "0.01"
+  memoryLimit: "100Mi"
+  memoryRequest: "10Mi"
+
+# identifiers
+projectIdentifier: project
+appIdentifier: app
+tierIdentifier: tier
+roleIdentifier: role

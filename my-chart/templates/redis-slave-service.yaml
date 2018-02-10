@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+{{- include "redis_slave_metadata" . }}
+spec:
+  ports:
+  - port: {{ .Values.redis.port }}
+  selector:
+     {{- include "redis_slave_labels" . | indent 4 }}

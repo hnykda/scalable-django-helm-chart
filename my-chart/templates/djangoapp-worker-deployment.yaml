@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+{{- include "django_metadata" . }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    {{- include "django_metadata" . | indent 4 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/djangoapp-configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/djangoapp-secrets.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - env:
+        - name: DJANGO_APP_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: DJANGO_APP_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+        envFrom:
+        - configMapRef:
+            name: djangoapp-configmap
+        - secretRef:
+            name: djangoapp-secrets
+        name: djangoapp-django
+        image: {{  .Values.django.djangoappImage }}:{{ required "Missing .Chart.appVersion" .Chart.AppVersion }}
+        resources:
+          limits:
+            cpu: {{ .Values.django.cpuLimit | quote }}
+            memory: {{ .Values.django.memoryLimit | quote }}
+          requests:
+            cpu: {{ .Values.django.cpuRequest | quote }}
+            memory: {{ .Values.django.memoryRequest | quote}}
+
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                  "-instances={{ required "Missing DB instance" .Values.env.dbInstance }}=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        resources:
+          limits:
+            cpu: {{ .Values.cloudsql.cpuLimit | quote }}
+            memory: {{ .Values.cloudsql.memoryLimit | quote }}
+          requests:
+            cpu: {{ .Values.cloudsql.cpuRequest | quote }}
+            memory: {{ .Values.cloudsql.memoryRequest | quote}}
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+          - name: cloudsql
+            mountPath: /cloudsql
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: cloudsql
+          emptyDir:
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs

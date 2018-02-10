@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-configmap
+  labels:
+    {{- include "base_labels" . | indent 4 }}
+    {{ .Values.appIdentifier }}: {{ .Values.django.app }}
+data:
+  # Django
+  DJANGO_APP_STATIC_URL: {{ .Values.env.staticFiles }}
+  DJANGO_APP_CACHE_BACKEND: "django_redis.cache.RedisCache"
+  # first element here is considered as master
+  DJANGO_APP_CACHE_LOCATION: "redis://djangoapp-redis-master:6379/1 redis://djangoapp-redis-slave:6379/1" 
+  DJANGO_APP_DJANGO_LOG_LEVEL: {{ .Values.env.djangoappLogLevel }}
+
+  # DB
+  DJANGO_APP_DB_ENGINE: "postgresql_psycopg2"
+  DJANGO_APP_DB_NAME: {{ .Values.env.dbName }}
+  DJANGO_APP_DB_HOST: "localhost"
+  DJANGO_APP_DB_PORT: "5432"

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+{{- include "redis_master_metadata" . }}
+spec:
+  replicas: 1
+  template:
+    {{- include "redis_master_metadata" . | indent 4}}
+    spec:
+      containers:
+      - name: master
+        image: {{ .Values.redis.image }}
+        ports:
+        - containerPort: {{ .Values.redis.port }}
+        resources:
+          limits:
+            cpu: {{ .Values.redis.cpuLimit | quote }}
+            memory: {{ .Values.redis.memoryLimit | quote }}
+          requests:
+            cpu: {{ .Values.redis.cpuRequest | quote }}
+            memory: {{ .Values.redis.memoryRequest | quote}}

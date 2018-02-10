@@ -1,0 +1,13 @@
+env:
+  # not consumed by pods directly
+  dbInstance: PROJECT_ID:europe-west1:SQL_DB_NAME
+  dbName: <DB_NAME>
+  staticFiles: "https://storage.googleapis.com/<MY_BUCKET>/static/"
+  djangoappLogLevel: "DEBUG"
+
+  # external static IP of the main loadbalancer
+  loadbalancerIP: <RESERVED_IP>
+
+  # this is consumed by djangoapp worker, but is a secret
+  secrets:
+    SECRET_KEY: "xxx"
