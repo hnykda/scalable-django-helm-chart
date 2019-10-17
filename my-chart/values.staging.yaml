@@ -1,6 +1,5 @@
 env:
-  # not consumed by pods directly
-  dbInstance: PROJECT_ID:europe-west1:SQL_DB_NAME
+  dbIpAddress: <DB_IP_ADDRESS>
   dbName: <DB_NAME>
   staticFiles: "https://storage.googleapis.com/<MY_BUCKET>/static/"
   djangoappLogLevel: "DEBUG"
