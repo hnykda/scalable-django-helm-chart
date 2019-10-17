@@ -16,5 +16,5 @@ data:
   # DB
   DJANGO_APP_DB_ENGINE: "postgresql_psycopg2"
   DJANGO_APP_DB_NAME: {{ .Values.env.dbName }}
-  DJANGO_APP_DB_HOST: "localhost"
+  DJANGO_APP_DB_HOST: {{ .Values.env.dbIpAddress }}
   DJANGO_APP_DB_PORT: "5432"
