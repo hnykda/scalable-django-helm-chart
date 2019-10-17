@@ -9,5 +9,9 @@ env:
   loadbalancerIP: <RESERVED_IP>
 
   # this is consumed by djangoapp worker, but is a secret
+  # should be ideally in a separated encrypted file so 
+  # you can version it but it's encrypted
   secrets:
     SECRET_KEY: "xxx"
+    DJANGO_APP_DB_USER: "###"
+    DJANGO_APP_DB_PASSWORD: "###"
